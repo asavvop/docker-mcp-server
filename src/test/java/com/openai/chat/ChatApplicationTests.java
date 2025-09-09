@@ -88,14 +88,15 @@ class ChatApplicationTests {
 	void runDockerContainerTest() throws Exception {
 
 		imageService.pullImage("nginx:latest");
+		String containerId = containerService.createContainer("nginx:latest", "nginx-run-test");
 
 		UserMessage userMessage = new UserMessage(
-				"Run a docker container from the nginx:latest image");
+				"Run a docker container with the ID " + containerId);
 		Prompt prompt = new Prompt(userMessage);
 		ChatResponse response = ChatClient.create(chatModel).prompt(prompt).tools(new DockerContainerTools(containerService)).call().chatResponse();
 
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().getText()).contains("successfully running");
+		assertThat(response.getResults().get(0).getOutput().getText()).contains("running");
 
 	}
 

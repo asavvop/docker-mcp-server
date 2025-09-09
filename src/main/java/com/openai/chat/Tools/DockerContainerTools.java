@@ -16,23 +16,21 @@ public class DockerContainerTools {
         this.containerService = containerService;
     }
 
-    @Tool(description = "Create a Docker container from a specified image with volume bindings")
+    @Tool(description = "Create a Docker container from a specified image with container name and volume bindings")
     String createDockerContainer(String imageName, String containerName, Map<String, String> volumes) throws Exception {
         var response = containerService.createContainer(imageName, containerName, volumes);
 
-        return "Docker container created with ID: " + response;
+        return "Container with ID: " + response + " has been created from image: " + imageName;
     }
 
-    @Tool(description = "Run a Docker container from a specified image")
-    String runDockerContainer(String imageName) throws Exception {
+    @Tool(description = "Run a Docker container from its ID")
+    String runDockerContainer(String containerId) throws Exception {
 
-        var response = containerService.createContainer(imageName, imageName);
+        containerService.startContainer(containerId);
 
-        containerService.startContainer(response);
+        var isRunning = containerService.isContainerRunning(containerId);
 
-        var isRunning = containerService.isContainerRunning(response);
-
-        return String.format("Docker container from image is %s running", isRunning ? "successfully" : "not and has ID " + response);
+        return String.format("Docker container with ID %s is %d running", containerId , isRunning ? "successfully" : "not");
     }
 
     @Tool(description = "Stop a Docker container by its ID")
