@@ -1,6 +1,6 @@
 # MCP Server
 
-This project is an MCP (Management Control Platform) server built with Spring AI. It provides tools and APIs to help you manage Docker images and containers efficiently.
+This project is an MCP (Model Context Protocol) server built with Spring AI. It provides tools and APIs to help you manage Docker images and containers efficiently.
 
 ## Features
 
