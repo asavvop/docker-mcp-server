@@ -7,7 +7,7 @@ This project is an MCP (Management Control Platform) server built with Spring AI
 - Manage Docker images (list, pull, remove)
 - Control Docker containers (start, stop, exists)
 - RESTful API endpoints for automation and integration
-- Powered by Spring AI for intelligent operations
+- Powered by Spring AI for intelligent operations and the Docker Model Runner
 
 ## Getting Started
 
@@ -15,6 +15,7 @@ This project is an MCP (Management Control Platform) server built with Spring AI
 
 - Java 17+
 - Docker installed and running
+- Docker model installed and enabled
 - Maven or Gradle
 
 ### Installation
@@ -27,6 +28,10 @@ This project is an MCP (Management Control Platform) server built with Spring AI
 2. Build the project:
     ```bash
     ./mvnw clean install
+    ```
+3. Pull a docker model:
+    ```bash
+    docker model pull ai/gemma3
     ```
 3. Run the server:
     ```bash
