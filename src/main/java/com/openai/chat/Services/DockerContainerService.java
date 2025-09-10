@@ -78,7 +78,7 @@ public class DockerContainerService implements IContainerService {
     public List<DockerContainer> listContainers() throws Exception {
         return dockerClient.listContainersCmd()
                 .withShowAll(true)
-                .exec().stream().map(c -> new DockerContainer(c.getId(), c.getNames()[0])).collect(Collectors.toList());
+                .exec().stream().map(c -> new DockerContainer(c.getId(), c.getNames()[0].replace("/", ""))).collect(Collectors.toList());
     }
 
     @Override
@@ -132,7 +132,7 @@ public class DockerContainerService implements IContainerService {
                 // Container with the same name already exists, return existing container ID
                 return listContainers().stream()
                         .filter(container -> container.getName() != null
-                                && List.of(container.getName()).contains("/" + containerName))
+                                && List.of(container.getName()).contains(containerName))
                         .findFirst()
                         .map(container -> container.getId())
                         .orElseThrow(() -> new Exception("Container with name " + containerName

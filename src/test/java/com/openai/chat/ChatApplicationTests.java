@@ -119,6 +119,22 @@ class ChatApplicationTests {
 	}
 
 	@Test
+	void listContainersTest() throws Exception {
+
+		imageService.pullImage("nginx:latest");
+		containerService.createContainer("nginx:latest", "nginx-list-1");
+		containerService.createContainer("nginx:latest", "nginx-list-2");
+
+		UserMessage userMessage = new UserMessage("Get all available docker containers in this host.");
+		Prompt prompt = new Prompt(userMessage);
+		ChatResponse response = ChatClient.create(chatModel).prompt(prompt)
+				.tools(new DockerContainerTools(containerService)).call().chatResponse();
+
+		assertThat(response.getResult()).isNotNull();
+		
+	}
+
+	@Test
 	void checkImageExistsInHost() throws Exception {
 		imageService.pullImage("nginx:latest");
 
