@@ -76,6 +76,9 @@ public class DockerContainerService implements IContainerService {
 
     @Override
     public List<DockerContainer> listContainers() throws Exception {
+
+        logger.info("Listing docker containers from container service");
+
         return dockerClient.listContainersCmd()
                 .withShowAll(true)
                 .exec().stream().map(c -> new DockerContainer(c.getId(), c.getNames()[0].replace("/", ""))).collect(Collectors.toList());

@@ -32,6 +32,9 @@
 		<spring-ai.version>1.0.1</spring-ai.version>
 	</properties>
 	<dependencies>
+
+		<!-- general spring boot -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -41,6 +44,8 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
+		<!-- spring ai -->
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
