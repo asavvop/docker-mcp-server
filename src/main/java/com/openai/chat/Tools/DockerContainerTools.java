@@ -55,7 +55,6 @@ public class DockerContainerTools {
             }
             StringBuilder response = new StringBuilder("docker containers in this machine: ");
             for (DockerContainer container : containers) {
-                //response.append("- id ").append(container.getId()).append(",");
                 response.append("name ").append(container.getName()).append("\n");
             }
             return response.toString();

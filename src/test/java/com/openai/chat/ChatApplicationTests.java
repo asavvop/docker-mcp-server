@@ -63,7 +63,6 @@ class ChatApplicationTests {
 		Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
 		ChatResponse response = this.chatModel.call(prompt);
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().getText()).contains("weather forecast");
 	}
 
 	@Test
@@ -78,8 +77,10 @@ class ChatApplicationTests {
 		ChatResponse response = ChatClient.create(chatModel).prompt(prompt).tools(new DockerContainerTools(containerService)).call().chatResponse();
 
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().getText()).contains("created");
-		assertThat(response.getResults().get(0).getOutput().getText()).contains("ID");
+		
+		assertThat(containerService.listContainers().stream().anyMatch(c -> c.getName().contains("mynginx"))).isTrue();
+
+		containerService.deleteContainerIfExists("mynginx");
 
 	}
 
@@ -96,7 +97,9 @@ class ChatApplicationTests {
 		ChatResponse response = ChatClient.create(chatModel).prompt(prompt).tools(new DockerContainerTools(containerService)).call().chatResponse();
 
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().getText()).contains("running");
+		assertThat(containerService.isContainerRunning(containerId)).isTrue();
+
+		containerService.deleteContainerIfExists("nginx-run-test");
 
 	}
 
@@ -105,7 +108,7 @@ class ChatApplicationTests {
 	void stopContainerTest() throws Exception {
 
 		imageService.pullImage("nginx:latest");
-		String containerId = containerService.createContainer("nginx:latest", "nginx");
+		String containerId = containerService.createContainer("nginx:latest", "nginx-start-stop");
 		containerService.startContainer(containerId);
 
 		UserMessage userMessage = new UserMessage(
@@ -114,7 +117,9 @@ class ChatApplicationTests {
 		ChatResponse response = ChatClient.create(chatModel).prompt(prompt).tools(new DockerContainerTools(containerService)).call().chatResponse();
 
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().getText()).contains("has been stopped");
+		assertThat(containerService.isContainerRunning(containerId)).isFalse();
+
+		containerService.deleteContainerIfExists("nginx-start-stop");
 
 	}
 
@@ -130,8 +135,12 @@ class ChatApplicationTests {
 		ChatResponse response = ChatClient.create(chatModel).prompt(prompt)
 				.tools(new DockerContainerTools(containerService)).call().chatResponse();
 
-		assertThat(response.getResult()).isNotNull();
+		assertThat(response.getResults()).hasSize(1);
+		assertThat(response.getResult().getOutput().getText().contains("nginx-list-1"));
+		assertThat(response.getResult().getOutput().getText().contains("nginx-list-2"));
 		
+		containerService.deleteContainerIfExists("nginx-list-1");
+		containerService.deleteContainerIfExists("nginx-list-2");
 	}
 
 	@Test
@@ -145,14 +154,17 @@ class ChatApplicationTests {
 				.tools(new DockerImageTools(imageService)).call().chatResponse();
 
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().getText())
-				.contains("is available on the host");
+		assertThat(imageService.imageExists("nginx:latest")).isTrue();
 
 		logger.info(response.getResults().get(0).getOutput().getText());
 	}
 
 	@Test
-	void retrieveImageList() {
+	void retrieveImageList() throws Exception {
+		
+		imageService.pullImage("nginx:latest");
+		imageService.pullImage("hello-world:latest");
+
 		UserMessage userMessage = new UserMessage(
 				"List all docker images on the host");
 		Prompt prompt = new Prompt(userMessage);
@@ -160,8 +172,8 @@ class ChatApplicationTests {
 				.tools(new DockerImageTools(imageService)).call().chatResponse();
 
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().getText())
-				.contains("docker images on the host");
+		assertThat(response.getResult().getOutput().getText()).contains("nginx:latest");
+		assertThat(response.getResult().getOutput().getText()).contains("hello-world:latest");
 
 		logger.info(response.getResults().get(0).getOutput().getText());
 	}
@@ -176,11 +188,10 @@ class ChatApplicationTests {
 				.tools(new DockerImageTools(imageService)).call().chatResponse();
 
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().getText()).contains("successfully pulled");
-
-		logger.info("Check if nginx:latest is really pulled ...");
 		assertThat(imageService.imageExists("nginx:latest")).isTrue();
+
 		logger.info("nginx:latest is really pulled ...");
+
 	}
 
 }

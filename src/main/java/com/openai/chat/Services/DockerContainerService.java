@@ -149,12 +149,15 @@ public class DockerContainerService implements IContainerService {
 
         listContainers().stream()
                 .filter(container -> container.getName() != null
-                        && List.of(container.getName()).contains("/" + containerName))
+                        && List.of(container.getName()).contains(containerName))
                 .findFirst()
                 .map(container -> container.getId())
                 .ifPresent(containerId -> {
                     try {
                         stopContainer(containerId);
+                        dockerClient.removeContainerCmd(containerId).exec();
+                    } catch (NotModifiedException e) {  
+                        logger.info(containerName + "is already stopped");
                         dockerClient.removeContainerCmd(containerId).exec();
                     } catch (Exception e) {
                         logger.error("Error deleting container " + containerId, e);
