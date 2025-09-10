@@ -13,6 +13,7 @@ public class Testconfiguration {
 
     public static final String DEFAULT_MODEL = "ai/gemma3";
 
+    @SuppressWarnings("resource")
     @Container
     private static final SocatContainer socat = new SocatContainer().withTarget(80, "model-runner.docker.internal");
 

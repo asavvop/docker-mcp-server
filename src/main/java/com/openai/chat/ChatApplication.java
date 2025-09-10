@@ -11,6 +11,8 @@ public class ChatApplication {
 	private static Logger logger = LoggerFactory.getLogger(ChatApplication.class);
 
 	public static void main(String[] args) {
+		logger.info("Chat application started");
+
 		SpringApplication.run(ChatApplication.class, args);
 	}
 
